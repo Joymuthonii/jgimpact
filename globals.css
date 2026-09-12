@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background-color: #F8FAF8;
+  color: #172033;
+}
+
+/* Typography Base Styles */
+h1 {
+  @apply font-bold text-brand-navy;
+}
+
+h2 {
+  @apply font-semibold text-brand-navy;
+}
+
+h3 {
+  @apply font-semibold text-brand-navy;
+}
+
+p {
+  @apply text-brand-text;
+}
+
+/* Utility Classes */
+.btn-primary {
+  @apply px-6 py-3 bg-brand-green text-white font-medium rounded-radius-sm transition-all duration-200 ease-smooth hover:shadow-lg hover:-translate-y-1 active:shadow-md;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-transparent border border-brand-navy text-brand-navy font-medium rounded-radius-sm transition-all duration-200 ease-smooth hover:shadow-lg hover:-translate-y-1;
+}
+
+.btn-ghost {
+  @apply text-brand-green font-medium underline transition-all duration-200 ease-smooth hover:text-brand-navy;
+}
+
+.card {
+  @apply bg-white border border-brand-border rounded-radius-md shadow-sm transition-all duration-200 ease-smooth hover:border-brand-gold hover:-translate-y-1;
+}
+
+.section-header {
+  @apply mb-8;
+}
+
+/* Focus states for accessibility */
+:focus-visible {
+  @apply outline-2 outline-offset-2 outline-brand-green;
+}
+
+button:focus-visible {
+  @apply outline-2 outline-offset-2 outline-brand-green;
+}
+
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-2 outline-offset-2 outline-brand-green;
+}
+
+/* Loader animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
