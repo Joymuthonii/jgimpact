@@ -4,9 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+interface AdminUser {
+  name?: string;
+  email: string;
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<AdminUser | null>(null);
   const [stats, setStats] = useState({
     bookings: 0,
     contacts: 0,
@@ -23,11 +28,11 @@ export default function AdminDashboard() {
       return;
     }
 
-    setUser(JSON.parse(userData));
+    setUser(JSON.parse(userData) as AdminUser);
     fetchStats(token);
   }, [router]);
 
-  const fetchStats = async (token) => {
+  const fetchStats = async (token: string) => {
     try {
       const [bookingsRes, contactsRes, servicesRes] = await Promise.all([
         fetch('/api/bookings', {

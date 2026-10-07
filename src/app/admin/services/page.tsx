@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -33,9 +33,22 @@ const SERVICE_ICONS = {
   Megaphone,
 };
 
+function isServiceIcon(icon: string): icon is keyof typeof SERVICE_ICONS {
+  return Object.prototype.hasOwnProperty.call(SERVICE_ICONS, icon);
+}
+
+interface Service {
+  _id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  price?: number;
+  duration?: string;
+}
+
 export default function ServicesPage() {
   const router = useRouter();
-  const [services, setServices] = useState([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -71,7 +84,7 @@ export default function ServicesPage() {
     }
   };
 
-  const handleAddService = async (e) => {
+  const handleAddService = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -94,7 +107,7 @@ export default function ServicesPage() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this service?')) return;
 
     try {
@@ -151,7 +164,7 @@ export default function ServicesPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-3 py-2 border rounded"
-                  rows="3"
+                  rows={3}
                   required
                 />
               </div>
@@ -206,15 +219,18 @@ export default function ServicesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {services.map((service) => (
+            {services.map((service) => {
+              const Icon =
+                service.icon && isServiceIcon(service.icon)
+                  ? SERVICE_ICONS[service.icon]
+                  : null;
+
+              return (
               <div key={service._id} className="bg-white rounded-lg shadow p-6">
                 <div className="flex justify-between items-start mb-2">
                   <h4 className="text-lg font-bold flex items-center gap-2">
-                    {service.icon && SERVICE_ICONS[service.icon] ? (
-                      (() => {
-                        const Icon = SERVICE_ICONS[service.icon];
-                        return <Icon className="h-6 w-6 text-brand-green" />;
-                      })()
+                    {Icon ? (
+                      <Icon className="h-6 w-6 text-brand-green" />
                     ) : service.icon ? (
                       <span className="text-2xl">{service.icon}</span>
                     ) : null}
@@ -233,7 +249,8 @@ export default function ServicesPage() {
                   {service.duration && <span>Duration: {service.duration}</span>}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

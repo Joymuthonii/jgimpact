@@ -4,9 +4,19 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+interface Booking {
+  _id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  serviceType: string;
+  preferredDate: string;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+}
+
 export default function BookingsPage() {
   const router = useRouter();
-  const [bookings, setBookings] = useState([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState('');
 

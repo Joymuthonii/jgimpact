@@ -4,12 +4,24 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+interface Contact {
+  _id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+  status: 'new' | 'read' | 'responded';
+  response?: string;
+  createdAt: string;
+}
+
 export default function ContactsPage() {
   const router = useRouter();
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState('');
-  const [selectedContact, setSelectedContact] = useState(null);
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [response, setResponse] = useState('');
 
   useEffect(() => {
@@ -23,7 +35,7 @@ export default function ContactsPage() {
     fetchContacts(adminToken);
   }, [router]);
 
-  const fetchContacts = async (adminToken) => {
+  const fetchContacts = async (adminToken: string) => {
     try {
       const res = await fetch('/api/contacts', {
         headers: { 'Authorization': `Bearer ${adminToken}` },
@@ -39,7 +51,7 @@ export default function ContactsPage() {
     }
   };
 
-  const handleRespond = async (id) => {
+  const handleRespond = async (id: string) => {
     if (!response.trim()) return;
 
     try {
@@ -62,7 +74,7 @@ export default function ContactsPage() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this message?')) return;
 
     try {
@@ -176,7 +188,7 @@ export default function ContactsPage() {
                         onChange={(e) => setResponse(e.target.value)}
                         placeholder="Write your response..."
                         className="w-full px-3 py-2 border rounded text-sm"
-                        rows="4"
+                        rows={4}
                       />
                       <button
                         onClick={() => handleRespond(selectedContact._id)}
