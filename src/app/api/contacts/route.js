@@ -3,9 +3,9 @@ import Contact from '@/lib/models/Contact';
 import { verifyAuth, getTokenFromRequest } from '@/lib/auth';
 
 export async function GET(req) {
-  await dbConnect();
-
   try {
+    await dbConnect();
+
     const token = getTokenFromRequest(req);
     const auth = verifyAuth(token);
 
@@ -28,9 +28,9 @@ export async function GET(req) {
 }
 
 export async function POST(req) {
-  await dbConnect();
-
   try {
+    await dbConnect();
+
     const { fullName, email, phone, subject, message } = await req.json();
 
     if (!fullName || !email || !phone || !subject || !message) {

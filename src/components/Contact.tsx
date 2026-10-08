@@ -34,7 +34,8 @@ export default function Contact() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to send message')
+        const error = await response.json().catch(() => null)
+        throw new Error(error?.message || `Message could not be saved (HTTP ${response.status}).`)
       }
 
       setSubmitMessage('Thank you! We have received your message and will get back to you soon.')

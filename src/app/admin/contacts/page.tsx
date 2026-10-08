@@ -23,6 +23,8 @@ export default function ContactsPage() {
   const [token, setToken] = useState('');
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [response, setResponse] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const adminToken = localStorage.getItem('adminToken');
@@ -36,24 +38,35 @@ export default function ContactsPage() {
   }, [router]);
 
   const fetchContacts = async (adminToken: string) => {
+    setErrorMessage('');
     try {
       const res = await fetch('/api/contacts', {
         headers: { 'Authorization': `Bearer ${adminToken}` },
       });
 
-      if (!res.ok) throw new Error('Failed to fetch contacts');
+      if (!res.ok) {
+        const error = await res.json().catch(() => null);
+        throw new Error(error?.message || 'Failed to load contact messages.');
+      }
       const data = await res.json();
       setContacts(data);
     } catch (error) {
       console.error('Error fetching contacts:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to load contact messages.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleRespond = async (id: string) => {
-    if (!response.trim()) return;
+    const responseText = response.trim();
+    if (!responseText) {
+      setErrorMessage('Write a response before saving it.');
+      return;
+    }
 
+    setErrorMessage('');
+    setSuccessMessage('');
     try {
       const res = await fetch(`/api/contacts/${id}`, {
         method: 'PATCH',
@@ -61,34 +74,52 @@ export default function ContactsPage() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ response }),
+        body: JSON.stringify({ response: responseText }),
       });
 
-      if (res.ok) {
-        setResponse('');
-        setSelectedContact(null);
-        fetchContacts(token);
+      if (!res.ok) {
+        const error = await res.json().catch(() => null);
+        throw new Error(error?.message || 'Failed to save your response.');
       }
+      const updatedContact: Contact = await res.json();
+      setSelectedContact(updatedContact);
+      setContacts((currentContacts) =>
+        currentContacts.map((contact) => (contact._id === id ? updatedContact : contact))
+      );
+      setResponse('');
+      setSuccessMessage('Response saved. Use “Email this response” to compose and send it to the user.');
     } catch (error) {
       console.error('Error responding to contact:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to save your response.');
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this message?')) return;
 
+    setErrorMessage('');
     try {
       const res = await fetch(`/api/contacts/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
-      if (res.ok) {
-        fetchContacts(token);
+      if (!res.ok) {
+        const error = await res.json().catch(() => null);
+        throw new Error(error?.message || 'Failed to delete this message.');
       }
+      setContacts((currentContacts) => currentContacts.filter((contact) => contact._id !== id));
+      setSelectedContact(null);
     } catch (error) {
       console.error('Error deleting contact:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to delete this message.');
     }
+  };
+
+  const emailReplyUrl = (contact: Contact) => {
+    const subject = `Re: ${contact.subject}`;
+    const body = `Hi ${contact.fullName},\n\n${contact.response ?? ''}`;
+    return `mailto:${contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   return (
@@ -103,8 +134,22 @@ export default function ContactsPage() {
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {errorMessage && (
+          <div role="alert" className="mb-6 rounded border border-red-200 bg-red-50 p-4 text-red-800">
+            {errorMessage}
+          </div>
+        )}
+        {successMessage && (
+          <div role="status" className="mb-6 rounded border border-green-200 bg-green-50 p-4 text-green-800">
+            {successMessage}
+          </div>
+        )}
         {loading ? (
           <div className="text-center py-8">Loading...</div>
+        ) : errorMessage && contacts.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
+            Contact messages could not be loaded. Try refreshing the page, and check the Vercel function logs if the problem continues.
+          </div>
         ) : contacts.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
             No contact messages yet.
@@ -158,11 +203,21 @@ export default function ContactsPage() {
                     </div>
                     <div>
                       <label className="text-sm font-semibold text-gray-600">Email:</label>
-                      <p>{selectedContact.email}</p>
+                      <a
+                        href={`mailto:${selectedContact.email}`}
+                        className="text-blue-600 underline"
+                      >
+                        {selectedContact.email}
+                      </a>
                     </div>
                     <div>
                       <label className="text-sm font-semibold text-gray-600">Phone:</label>
-                      <p>{selectedContact.phone}</p>
+                      <a
+                        href={`tel:${selectedContact.phone.replace(/[^\d+]/g, '')}`}
+                        className="text-blue-600 underline"
+                      >
+                        {selectedContact.phone}
+                      </a>
                     </div>
                     <div>
                       <label className="text-sm font-semibold text-gray-600">Subject:</label>
@@ -178,6 +233,12 @@ export default function ContactsPage() {
                     <div className="mb-6 p-4 bg-green-50 rounded border border-green-200">
                       <p className="text-sm font-semibold text-green-800 mb-2">Response:</p>
                       <p className="text-sm whitespace-pre-wrap">{selectedContact.response}</p>
+                      <a
+                        href={emailReplyUrl(selectedContact)}
+                        className="mt-3 inline-block text-sm font-semibold text-blue-600 underline"
+                      >
+                        Email this response
+                      </a>
                     </div>
                   )}
 
@@ -194,7 +255,7 @@ export default function ContactsPage() {
                         onClick={() => handleRespond(selectedContact._id)}
                         className="w-full px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded font-semibold"
                       >
-                        Send Response
+                        Save Response
                       </button>
                     </div>
                   )}

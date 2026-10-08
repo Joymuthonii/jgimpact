@@ -4,9 +4,9 @@ import { verifyAuth, getTokenFromRequest } from '@/lib/auth';
 import { Types } from 'mongoose';
 
 export async function GET(req, { params }) {
-  await dbConnect();
-
   try {
+    await dbConnect();
+
     const { id } = params;
 
     if (!Types.ObjectId.isValid(id)) {
@@ -34,9 +34,9 @@ export async function GET(req, { params }) {
 }
 
 export async function PATCH(req, { params }) {
-  await dbConnect();
-
   try {
+    await dbConnect();
+
     const token = getTokenFromRequest(req);
     const auth = verifyAuth(token);
 
@@ -84,9 +84,9 @@ export async function PATCH(req, { params }) {
 }
 
 export async function DELETE(req, { params }) {
-  await dbConnect();
-
   try {
+    await dbConnect();
+
     const token = getTokenFromRequest(req);
     const auth = verifyAuth(token);
 
