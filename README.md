@@ -304,6 +304,6 @@ Location: Kenyatta Road, Juja, Behind Muigai Inn, Kiambu County, Kenya
 
 Phone: 0703 653 555 | 0702 492 050
 
-Email: journeyimpact@gmail.com
+Email: journeygimpact@gmail.com
 
 WhatsApp: https://wa.me/254703653555

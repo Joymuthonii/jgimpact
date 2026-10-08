@@ -177,7 +177,7 @@ https://wa.me/254723456789
 Update phone and email:
 ```typescript
 href="tel:0703653555"  // Change phone
-href="mailto:journeyimpact@gmail.com"  // Change email
+href="mailto:journeygimpact@gmail.com"  // Change email
 ```
 
 **File:** `src/components/Footer.tsx`
@@ -570,7 +570,7 @@ Create `.env.local` file in project root:
 
 ```
 NEXT_PUBLIC_FACILITY_PHONE=0703653555
-NEXT_PUBLIC_FACILITY_EMAIL=journeyimpact@gmail.com
+NEXT_PUBLIC_FACILITY_EMAIL=journeygimpact@gmail.com
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
 ```
 

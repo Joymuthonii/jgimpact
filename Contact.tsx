@@ -126,10 +126,10 @@ export default function Contact() {
                 <div>
                   <h3 className="font-semibold text-brand-navy mb-2">Email</h3>
                   <a
-                    href="mailto:journeyimpact@gmail.com"
+                    href="mailto:journeygimpact@gmail.com"
                     className="text-brand-green font-semibold hover:text-brand-navy transition-colors text-sm"
                   >
-                    journeyimpact@gmail.com
+                    journeygimpact@gmail.com
                   </a>
                 </div>
               </div>
