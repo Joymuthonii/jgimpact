@@ -86,13 +86,13 @@ export default function FacilityGallery() {
           </div>
 
           {/* Gallery Carousel */}
-          <div className="relative mx-auto max-w-4xl">
+          <div className="relative mx-auto max-w-xl">
             <button
               onClick={() => setSelectedImage(currentItem.id)}
               className="group relative block w-full overflow-hidden rounded-radius-md cursor-pointer"
               aria-label={`View ${currentItem.title}`}
             >
-              <div className="relative aspect-video bg-brand-canvas">
+              <div className="relative aspect-[3/4] bg-brand-canvas">
                 <Image
                   key={currentItem.image}
                   src={`/images/${currentItem.image}`}
@@ -100,7 +100,7 @@ export default function FacilityGallery() {
                   fill
                   priority={currentIndex === 0}
                   sizes="(max-width: 768px) 100vw, 896px"
-                  className="object-cover transition-opacity duration-300"
+                  className="object-contain transition-opacity duration-300"
                 />
                 <div className="absolute inset-x-0 bottom-0 bg-black/60 p-4 text-left">
                   <p className="text-sm font-semibold text-white md:text-base">
@@ -151,7 +151,7 @@ export default function FacilityGallery() {
           className="fixed inset-0 bg-black/75 z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-2xl w-full">
+          <div className="relative mx-auto w-full max-w-lg">
             <button
               onClick={() => setSelectedImage(null)}
               className="absolute -top-12 right-0 text-white hover:text-brand-gold transition-colors"
@@ -159,7 +159,7 @@ export default function FacilityGallery() {
             >
               <X className="w-8 h-8" />
             </button>
-            <div className="relative bg-brand-canvas rounded-radius-md aspect-video overflow-hidden">
+            <div className="relative h-[80vh] max-h-[700px] overflow-hidden rounded-radius-md bg-brand-canvas">
               <Image
                 src={`/images/${GALLERY_ITEMS.find(item => item.id === selectedImage)?.image}`}
                 alt={GALLERY_ITEMS.find(item => item.id === selectedImage)?.title || 'Facility photo'}
