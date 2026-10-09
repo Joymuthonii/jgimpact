@@ -1,5 +1,6 @@
 import dbConnect from '@/lib/db';
 import Contact from '@/lib/models/Contact';
+import User from '@/lib/models/User';
 import { verifyAuth, getTokenFromRequest } from '@/lib/auth';
 
 export async function GET(req) {
@@ -15,7 +16,11 @@ export async function GET(req) {
       });
     }
 
-    const contacts = await Contact.find().populate('respondedBy', 'name email');
+    const contacts = await Contact.find().populate({
+      path: 'respondedBy',
+      select: 'name email',
+      model: User,
+    });
     
     return new Response(JSON.stringify(contacts), { status: 200 });
   } catch (error) {
