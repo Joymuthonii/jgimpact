@@ -1,6 +1,5 @@
 import dbConnect from '@/lib/db';
 import Contact from '@/lib/models/Contact';
-import User from '@/lib/models/User';
 import { verifyAuth, getTokenFromRequest } from '@/lib/auth';
 import { Types } from 'mongoose';
 
@@ -16,11 +15,7 @@ export async function GET(req, { params }) {
       });
     }
 
-    const contact = await Contact.findById(id).populate({
-      path: 'respondedBy',
-      select: 'name email',
-      model: User,
-    });
+    const contact = await Contact.findById(id).lean();
 
     if (!contact) {
       return new Response(JSON.stringify({ message: 'Contact not found' }), {
@@ -70,10 +65,6 @@ export async function PATCH(req, { params }) {
     const contact = await Contact.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
-    }).populate({
-      path: 'respondedBy',
-      select: 'name email',
-      model: User,
     });
 
     if (!contact) {
