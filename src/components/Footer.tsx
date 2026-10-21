@@ -6,7 +6,7 @@ export default function Footer() {
   return (
     <footer className="bg-brand-navy text-white py-12 md:py-16">
       <div className="max-w-7xl mx-auto px-4 md:px-0">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Column 1: Logo & Info */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-4">
@@ -58,7 +58,37 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Contact & Legal */}
+          {/* Column 3: Social Media */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Follow JG Impact</h3>
+            <p className="text-white/80 text-sm">
+              Follow us on social media for updates and stories from our community.
+            </p>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <a
+                  href="https://www.instagram.com/jg_impact?obrf=MWtxNGN0anJwc2o2Yg=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  Instagram
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://www.tiktok.com/@journeygrowthimpact?_r=1&_t=ZS-9Ak2eCnDrs5"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  TikTok
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact & Legal */}
           <div className="space-y-4">
             <h3 className="font-semibold">Contact & Information</h3>
             <div className="space-y-2 text-sm">
