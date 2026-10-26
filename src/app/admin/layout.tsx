@@ -21,6 +21,7 @@ export default function AdminLayout({
     let lastRefreshAttempt = 0;
     let isRefreshing = false;
     let logoutTimeout: number | undefined;
+    let inactivityCheckInterval: number | undefined;
 
     const clearSession = () => {
       localStorage.removeItem('adminToken');
@@ -47,17 +48,24 @@ export default function AdminLayout({
       localStorage.setItem(ACTIVITY_STORAGE_KEY, String(Date.now()));
     }
 
-    const scheduleLogout = () => {
+    let scheduleLogout = () => {};
+    const checkInactivity = () => {
+      const lastActivity = Number(localStorage.getItem(ACTIVITY_STORAGE_KEY));
+      if (!lastActivity || Date.now() - lastActivity >= INACTIVITY_TIMEOUT_MS) {
+        clearSession();
+        return;
+      }
+      scheduleLogout();
+    };
+
+    scheduleLogout = () => {
       if (logoutTimeout !== undefined) {
         window.clearTimeout(logoutTimeout);
       }
 
       const lastActivity = Number(localStorage.getItem(ACTIVITY_STORAGE_KEY));
       const remaining = INACTIVITY_TIMEOUT_MS - (Date.now() - lastActivity);
-      logoutTimeout = window.setTimeout(
-        clearSession,
-        Math.max(remaining, 0)
-      );
+      logoutTimeout = window.setTimeout(checkInactivity, Math.max(remaining, 0));
     };
 
     const recordActivity = () => {
@@ -124,25 +132,33 @@ export default function AdminLayout({
       if (event.key === 'adminToken' && !event.newValue) {
         router.replace('/admin');
       } else if (event.key === ACTIVITY_STORAGE_KEY) {
-        const lastActivity = Number(event.newValue);
-        if (!lastActivity || Date.now() - lastActivity >= INACTIVITY_TIMEOUT_MS) {
-          clearSession();
-          return;
-        }
-        scheduleLogout();
+        checkInactivity();
+      }
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkInactivity();
       }
     };
     window.addEventListener('storage', handleStorage);
+    window.addEventListener('focus', checkInactivity);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     scheduleLogout();
+    inactivityCheckInterval = window.setInterval(checkInactivity, 30 * 1000);
 
     return () => {
       if (logoutTimeout !== undefined) {
         window.clearTimeout(logoutTimeout);
       }
+      if (inactivityCheckInterval !== undefined) {
+        window.clearInterval(inactivityCheckInterval);
+      }
       activityEvents.forEach((eventName) =>
         window.removeEventListener(eventName, recordActivity)
       );
       window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', checkInactivity);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [pathname, router]);
 

@@ -119,12 +119,18 @@ export default function AdminDashboard() {
         {/* Quick Links */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Link
               href="/admin/bookings"
               className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded text-center"
             >
               Manage Bookings
+            </Link>
+            <Link
+              href="/admin/bookings/monitor"
+              className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded text-center"
+            >
+              Monitor Booking Status
             </Link>
             <Link
               href="/admin/contacts"

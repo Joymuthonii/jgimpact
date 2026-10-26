@@ -1,10 +1,9 @@
 import dbConnect from '@/lib/db';
 import Booking from '@/lib/models/Booking';
 import { verifyAuth, getTokenFromRequest } from '@/lib/auth';
+import { createBookingExport } from '@/lib/bookingSpreadsheet';
 
 export async function GET(req) {
-  await dbConnect();
-
   try {
     const token = getTokenFromRequest(req);
     const auth = verifyAuth(token);
@@ -12,6 +11,21 @@ export async function GET(req) {
     if (!auth) {
       return new Response(JSON.stringify({ message: 'Unauthorized' }), {
         status: 401,
+      });
+    }
+
+    await dbConnect();
+    if (new URL(req.url).searchParams.get('format') === 'xlsx') {
+      const bookings = await Booking.find().lean();
+      const workbook = await createBookingExport(bookings);
+      return new Response(workbook, {
+        status: 200,
+        headers: {
+          'Content-Type':
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'Content-Disposition': 'attachment; filename="jg-impact-bookings.xlsx"',
+          'Cache-Control': 'no-store',
+        },
       });
     }
 
