@@ -63,7 +63,6 @@ export default function AdminLogin() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-brand-gold"
-              placeholder="admin@jgimpact.com"
               required
             />
           </div>

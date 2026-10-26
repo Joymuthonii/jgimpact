@@ -1,3 +1,5 @@
+import dbConnect from '@/lib/db';
+import Service from '@/lib/models/Service';
 import { verifyAuth, getTokenFromRequest } from '@/lib/auth';
 import { createBookingTemplate } from '@/lib/bookingSpreadsheet';
 
@@ -9,7 +11,16 @@ export async function GET(req) {
   }
 
   try {
-    const workbook = await createBookingTemplate();
+    await dbConnect();
+    const services = await Service.find({ isActive: true }).sort('order').select('name').lean();
+    if (services.length === 0) {
+      return Response.json(
+        { message: 'Add at least one active service before downloading the booking template.' },
+        { status: 400 }
+      );
+    }
+
+    const workbook = await createBookingTemplate(services.map((service) => service.name));
     return new Response(workbook, {
       status: 200,
       headers: {
