@@ -34,10 +34,14 @@ Located in `src/app/api/`:
 
 #### Bookings
 - `GET /api/bookings` - List all bookings (requires auth)
-- `POST /api/bookings` - Create new booking
+- `GET /api/bookings?format=xlsx` - Export bookings to Excel (requires auth)
+- `POST /api/bookings` - Create a website booking and notify the admin by email
 - `GET /api/bookings/[id]` - Get single booking
 - `PATCH /api/bookings/[id]` - Update booking status (requires auth)
 - `DELETE /api/bookings/[id]` - Delete booking (requires auth)
+- `POST /api/bookings/import` - Import validated Excel bookings (requires admin auth)
+- `GET /api/bookings/template` - Download the Excel booking template (requires admin auth)
+- `GET /api/cron/booking-notifications` - Retry failed alerts and send 24-hour session reminders (requires `CRON_SECRET`)
 
 #### Contacts
 - `GET /api/contacts` - List all contact messages (requires auth)
@@ -73,11 +77,24 @@ Located in `src/app/admin/`:
    JWT_SECRET=your_secret_key
    ADMIN_EMAIL=admin@jgimpact.com
   ADMIN_PASSWORD=choose-a-strong-unique-password
+   RESEND_API_KEY=re_your_resend_api_key
+   RESEND_FROM_EMAIL="JG Impact <notifications@your-verified-domain.com>"
+   CRON_SECRET=your_long_random_cron_secret
+   NEXT_PUBLIC_SITE_URL=https://your-production-domain.com
    ```
 
 2. Get MongoDB connection string from:
    - **MongoDB Atlas** (cloud): https://www.mongodb.com/cloud/atlas
    - **Local MongoDB**: `mongodb://localhost:27017/jg-impact`
+
+3. Configure booking email notifications:
+   - Create a Resend account and verify the domain used in `RESEND_FROM_EMAIL`.
+   - Create an API key and set `RESEND_API_KEY` in local and production environment settings.
+   - Set `ADMIN_EMAIL` to the inbox that should receive booking alerts.
+   - Set `NEXT_PUBLIC_SITE_URL` to the deployed website URL so notification emails link to the admin portal.
+   - `vercel.json` runs `/api/cron/booking-notifications` every five minutes. Set `CRON_SECRET` in Vercel; scheduled requests use it to authenticate.
+   - Website bookings trigger an immediate admin email. The scheduled job retries failed alerts and emails a reminder 24 hours before upcoming pending or confirmed sessions, including Excel imports. Download a fresh Excel template to include the required Preferred Time column.
+   - For local testing, invoke the cron endpoint with `Authorization: Bearer <CRON_SECRET>`. Do not expose the secret in client-side code.
 
 ### Step 2: Access Admin Dashboard
 1. Go to `http://localhost:3000/admin`

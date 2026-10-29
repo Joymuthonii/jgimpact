@@ -74,8 +74,8 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
       let [hours, minutes] = timeValue.split(':').map(Number)
       if (meridiem === 'PM' && hours !== 12) hours += 12
       if (meridiem === 'AM' && hours === 12) hours = 0
-      const preferredDate = new Date(data.date)
-      preferredDate.setHours(hours, minutes, 0, 0)
+      const [year, month, day] = data.date.split('-').map(Number)
+      const preferredDate = new Date(Date.UTC(year, month - 1, day, hours - 3, minutes))
 
       const response = await fetch('/api/bookings', {
         method: 'POST',

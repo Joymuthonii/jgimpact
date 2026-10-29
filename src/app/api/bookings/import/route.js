@@ -68,7 +68,14 @@ export async function POST(req) {
 
   try {
     await dbConnect();
-    const insertedBookings = await Booking.insertMany(bookings, { ordered: true });
+    const insertedBookings = await Booking.insertMany(
+      bookings.map((booking) => ({
+        ...booking,
+        adminNotificationStatus: 'not-required',
+        adminReminderStatus: 'pending',
+      })),
+      { ordered: true }
+    );
     return Response.json(
       {
         message: `${insertedBookings.length} bookings imported successfully.`,

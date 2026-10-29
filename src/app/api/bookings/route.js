@@ -2,6 +2,7 @@ import dbConnect from '@/lib/db';
 import Booking from '@/lib/models/Booking';
 import { verifyAuth, getTokenFromRequest } from '@/lib/auth';
 import { createBookingExport } from '@/lib/bookingSpreadsheet';
+import { sendAdminBookingEmail } from '@/lib/adminBookingNotifications';
 
 export async function GET(req) {
   try {
@@ -63,9 +64,50 @@ export async function POST(req) {
       preferredDate: new Date(preferredDate),
       notes,
       status: 'pending',
+      adminNotificationStatus: 'pending',
     });
 
     await booking.save();
+
+    try {
+      const claimedBooking = await Booking.findOneAndUpdate(
+        { _id: booking._id, adminNotificationStatus: 'pending' },
+        {
+          $set: {
+            adminNotificationStatus: 'sending',
+            adminNotificationClaimedAt: new Date(),
+          },
+        },
+        { new: true }
+      );
+      if (!claimedBooking) {
+        throw new Error('Could not claim the new booking notification.');
+      }
+      await sendAdminBookingEmail(claimedBooking, 'new');
+      await Booking.updateOne(
+        { _id: booking._id, adminNotificationStatus: 'sending' },
+        {
+          $set: {
+            adminNotificationStatus: 'sent',
+            adminNotificationSentAt: new Date(),
+          },
+          $unset: { adminNotificationClaimedAt: 1 },
+        }
+      );
+    } catch (error) {
+      console.error('New booking admin notification failed; it will be retried:', error);
+      try {
+        await Booking.updateOne(
+          { _id: booking._id, adminNotificationStatus: 'sending' },
+          {
+            $set: { adminNotificationStatus: 'pending' },
+            $unset: { adminNotificationClaimedAt: 1 },
+          }
+        );
+      } catch (resetError) {
+        console.error('Could not reset the failed booking email for retry:', resetError);
+      }
+    }
 
     return new Response(
       JSON.stringify({

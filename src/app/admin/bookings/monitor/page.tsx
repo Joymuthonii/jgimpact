@@ -174,7 +174,11 @@ export default function BookingMonitorPage() {
                     </td>
                     <td className="px-5 py-4 text-sm">{booking.serviceType}</td>
                     <td className="px-5 py-4 text-sm">
-                      {new Date(booking.preferredDate).toLocaleDateString()}
+                      {new Intl.DateTimeFormat('en-KE', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                        timeZone: 'Africa/Nairobi',
+                      }).format(new Date(booking.preferredDate))}
                     </td>
                     <td className="px-5 py-4 text-sm">
                       <label className="sr-only" htmlFor={`booking-status-${booking._id}`}>

@@ -282,7 +282,11 @@ export default function BookingsPage() {
                     <td className="px-6 py-4 text-sm">{booking.phone}</td>
                     <td className="px-6 py-4 text-sm">{booking.serviceType}</td>
                     <td className="px-6 py-4 text-sm">
-                      {new Date(booking.preferredDate).toLocaleDateString()}
+                      {new Intl.DateTimeFormat('en-KE', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                        timeZone: 'Africa/Nairobi',
+                      }).format(new Date(booking.preferredDate))}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <select
